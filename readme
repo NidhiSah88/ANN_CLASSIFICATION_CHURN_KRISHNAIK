@@ -1,5 +1,4 @@
 
-
 conda create -p venv python==3.12 -y 
 conda activate venv/
 pip install -r requirements.txt
@@ -35,7 +34,475 @@ python -m ipykernel install --user --name=tfenv --display-name "TensorFlow Env"
 
 TO RUN app.py file: 
 streamlit run app.py 
+python -m streamlit run app.py
 
+
+
+IF by istake you commited venv folder and not able to push :
+
+1. Delete existing git history
+
+Inside your project folder run:
+
+rm -rf .git
+
+This removes ONLY git history, not your project files.
+
+2. Create .gitignore
+
+Create .gitignore file with:
+
+venv/
+tfenv/
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+.DS_Store
+3. Reinitialize git
+git init
+4. Add remote again
+git remote add origin git@github.com:NidhiSah88/ANN_CLASSIFICATION_CHURN_KRISHNAIK.git
+5. Add files
+git add .
+
+Check what is being added:
+
+git status
+
+Make sure:
+
+venv/ is NOT listed
+tfenv/ is NOT listed
+6. Commit
+git commit -m "Initial commit"
+7. Push
+git branch -M main
+git push -u origin main --force
+
+This will fix the GitHub large file error completely.
+
+
+/////////
+
+ERROR: Failed to launch TensorBoard (exited with 1). Contents of stderr:
+
+FIX: 
+Run these commands in terminal (NOT notebook):
+pip uninstall tensorboard setuptools -y
+
+pip install setuptools==69.5.1
+pip install tensorboard
+
+python -c "import pkg_resources; print('OK')"
+
+You should see:
+
+OK
+
+
+Then restart VS Code kernel and run:
+
+%load_ext tensorboard
+
+and:
+
+%tensorboard --logdir logs/fit
+
+//// KERNEL IS CRASHED ////
+FIX:
+The logs clearly show the problem:
+
+VS Code is STILL using:
+
+venv/bin/python (Python 3.12)
+
+instead of:
+
+tfenv/bin/python (Python 3.10)
+
+That is why TensorFlow crashes.
+
+The important line is:
+
+Kernel 'venv (Python 3.12.0)' died
+
+and:
+
+Starting Kernel ... venv/bin/python
+
+So the fix is to completely remove the broken venv kernel and force VS Code to use tfenv.
+
+Do this EXACTLY
+
+1. Delete old broken kernel
+
+Run in terminal:
+
+jupyter kernelspec list
+
+You will see kernels like:
+
+venv
+tfenv
+
+Now remove broken venv kernel:
+
+jupyter kernelspec uninstall venv
+
+Type y.
+
+2. Re-register tfenv correctly
+
+Activate tfenv:
+source tfenv/bin/activate
+
+Then run:
+
+python -m ipykernel install --user --name=tfenv --display-name "TensorFlow Env"
+3. Close VS Code completely
+Cmd + Q
+4. Reopen project
+
+Open ONLY:
+
+ANN_CLASSIFICATION_APP_UDEMY_KRISHNAIK
+
+5. Open notebook
+
+Open:
+
+experiments.ipynb
+6. VERY IMPORTANT — select correct kernel
+
+Top-right → click kernel name.
+
+Choose:
+
+Select Another Kernel
+
+Then choose:
+
+TensorFlow Env
+
+NOT:
+
+venv
+base
+Python 3.12
+7. Verify before importing tensorflow
+
+Run this FIRST:
+
+import sys
+print(sys.executable)
+
+You MUST see:
+
+.../tfenv/bin/python
+
+If you see venv/bin/python, stop — wrong kernel selected.
+
+8. Then run TensorFlow
+import tensorflow as tf
+print(tf.__version__)
+
+This should work now without crashing.
+
+
+
+jupyter kernelspec list
+Available kernels:
+  tfenv      /Users/nidhikumari/Library/Jupyter/kernels/tfenv
+  venv       /Users/nidhikumari/Library/Jupyter/kernels/venv
+  python3    /Library/Frameworks/Python.framework/Versions/3.11/share/jupyter/kernels/python3
+(base) nidhikumari@Nidhis-MacBook-Pro ANN_CLASSIFICATION_APP_UDEMY_KRISHNAIK % 
+
+Good. Now remove the broken venv kernel because VS Code keeps selecting it automatically.
+
+Run:
+
+jupyter kernelspec uninstall venv
+
+Type:
+
+y
+
+Then activate tfenv again:
+
+source tfenv/bin/activate
+
+Re-register tfenv cleanly:
+
+python -m ipykernel install --user --name=tfenv --display-name "TensorFlow Env"
+
+Now:
+Completely quit VS Code (Cmd + Q)
+Reopen project
+Open notebook
+
+Top-right kernel selector → choose:
+
+TensorFlow Env
+
+Before importing TensorFlow, verify with:
+
+import sys
+print(sys.executable)
+
+You MUST see:
+
+.../tfenv/bin/python
+
+Then run:
+import tensorflow as tf
+print(tf.__version__)
+
+This should finally work without kernel crash.
+
+i want to deleete tfenv, and use venv
+
+That’s fine, but your current venv is broken because it uses Python 3.12, which is causing TensorFlow kernel crashes on your Apple Silicon Mac.
+
+The clean solution is:
+
+delete both old environments
+recreate venv using Python 3.10
+install TensorFlow correctly
+
+use only one environment (venv)
+Step 1 — Delete old environments
+
+From project folder:
+
+rm -rf venv
+rm -rf tfenv
+Step 2 — Create fresh venv with Python 3.10
+python3.10 -m venv venv
+Step 3 — Activate it
+source venv/bin/activate
+
+Now terminal should show:
+
+(venv)
+Step 4 — Install packages
+
+For your Apple Silicon Mac:
+
+pip install tensorflow-macos==2.16.2 tensorflow-metal
+pip install pandas scikit-learn notebook ipykernel
+Step 5 — Register kernel
+python -m ipykernel install --user --name=venv --display-name "venv"
+
+Step 6 — Remove old kernels
+jupyter kernelspec uninstall tfenv
+
+Type y.
+
+Then optionally:
+
+jupyter kernelspec uninstall venv
+
+if old broken one still exists.
+
+Then re-register again:
+
+python -m ipykernel install --user --name=venv --display-name "venv"
+
+Step 7 — Restart VS Code
+
+Open notebook → select kernel:
+
+venv
+Step 8 — Verify
+
+Run FIRST:
+
+import sys
+print(sys.executable)
+
+You should see:
+
+.../venv/bin/python
+
+Then test TensorFlow:
+
+import tensorflow as tf
+print(tf.__version__)
+
+This should work without crashes now.
+
+
+
+
+
+
+
+//////
+error.ModuleNotFoundError: No module named 'tensorflow'
+Traceback:
+File "/opt/anaconda3/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 85, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+File "/opt/anaconda3/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 576, in code_to_exec
+    exec(code, module.__dict__)
+File "/Users/nidhikumari/Desktop/ANN_CLASSIFICATION_APP_UDEMY_KRISHNAIK/app.py", line 3, in <module>
+    import tensorflow as tf
+
+
+
+FIXX:
+
+streamlit is running from your Anaconda base Python 3.12 environment, not from your venv.
+
+That’s why it cannot find TensorFlow.
+
+Your error shows:
+
+/opt/anaconda3/lib/python3.12/
+
+which means Streamlit is using conda base.
+
+You must run Streamlit from your venv.
+
+Step 1 — Activate venv
+
+In terminal:
+
+source venv/bin/activate
+
+
+Your prompt should look like:
+
+(venv)
+
+NOT (base).
+
+If (base) appears, run:
+
+conda deactivate
+
+until only (venv) remains.
+
+Step 2 — Install streamlit inside venv
+
+Run:
+
+pip install streamlit
+Step 3 — Verify correct Python
+
+Run:
+
+which python
+
+You should see:
+
+.../ANN_CLASSIFICATION_APP_UDEMY_KRISHNAIK/venv/bin/python
+
+Then:
+
+which streamlit
+
+You should see:
+
+.../ANN_CLASSIFICATION_APP_UDEMY_KRISHNAIK/venv/bin/streamlit
+Step 4 — Run app
+
+Now run:
+
+streamlit run app.py
+
+TensorFlow should load correctly now.
+
+
+(venv) (base) nidhikumari@Nidhis-MacBook-Pro ANN_CLASSIFICATION_APP_UDEMY_KRISHNAIK % clear
+(venv) (base) nidhikumari@Nidhis-MacBook-Pro ANN_CLASSIFICATION_APP_UDEMY_KRISHNAIK % streamlit run app.py
+
+
+
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8501
+  Network URL: http://192.168.1.8:8501
+
+2026-05-16 15:24:40.037 Uncaught app exception
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 85, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/opt/anaconda3/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 576, in code_to_exec
+    exec(code, module.__dict__)
+  File "/Users/nidhikumari/Desktop/ANN_CLASSIFICATION_APP_UDEMY_KRISHNAIK/app.py", line 3, in <module>
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+You are still running Streamlit from Anaconda base, not from your venv.
+
+The proof is this line:
+
+/opt/anaconda3/lib/python3.12/site-packages/streamlit/
+
+Even though terminal shows (venv), the streamlit command itself is coming from Anaconda.
+
+Fix it like this.
+
+Step 1 — Fully deactivate conda base
+
+Run:
+
+conda deactivate
+
+Keep running it until (base) disappears.
+
+You want:
+
+(venv)
+
+ONLY.
+
+Step 2 — Verify streamlit path
+
+Run:
+
+which streamlit
+
+RIGHT NOW it probably shows:
+
+/opt/anaconda3/bin/streamlit
+
+which is wrong.
+
+Step 3 — Install streamlit inside venv
+
+While only (venv) is active:
+
+pip install streamlit
+Step 4 — Verify again
+
+Run:
+
+which streamlit
+
+NOW it should show something like:
+
+.../ANN_CLASSIFICATION_APP_UDEMY_KRISHNAIK/venv/bin/streamlit
+Step 5 — Run app correctly
+
+Use:
+
+python -m streamlit run app.py
+
+instead of plain streamlit run app.py.
+
+This forces Streamlit to use the current venv Python interpreter with TensorFlow installed.
+
+
+
+
+///////////
+
+source venv/bin/activate
+python -m streamlit run streamlit_regression.py
+python -m streamlit run streamlit_regression.py
 
 
 

@@ -20,7 +20,8 @@ with open('scaler.pkl', 'rb') as file:
 
 
 ## streamlit app
-st.title('Customer Churn PRediction')
+
+st.title('Estimated Salary Prediction')
 
 # User input
 geography = st.selectbox('Geography', onehot_encoder_geo.categories_[0])
@@ -59,16 +60,15 @@ input_data = pd.concat([input_data.reset_index(drop=True), geo_encoded_df], axis
 # Scale the input data
 input_data_scaled = scaler.transform(input_data)
 
-# Predict churn
+# Predict estimated salary
 prediction = model.predict(input_data_scaled)
 prediction_proba = prediction[0][0]
 
-st.write(f'Churn Probability: {prediction_proba:.2f}')
+st.write(f'Estimated Salary: {prediction_proba:.2f}')
 
-if prediction_proba > 0.5:
-    st.write('The customer is likely to churn.')
-else:
-    st.write('The customer is not likely to churn.')
+
+
+
 
 
 
