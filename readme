@@ -504,6 +504,13 @@ source venv/bin/activate
 python -m streamlit run streamlit_regression.py
 python -m streamlit run streamlit_regression.py
 
+////
+if you add anything new in requirement.txt , then run in terminal : pip install -r requirement.txt 
+
+pip install scikeras 
+
+conda deactivate -- se base remove ho jata hai 
+
 
 
 
